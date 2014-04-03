@@ -1,1 +1,5 @@
 <h1>CitiBike!</h1>
+
+<% @stations["stationBeanList"].each do |station| %>
+<p><%= station["stationName"] %></p>
+<% end %>

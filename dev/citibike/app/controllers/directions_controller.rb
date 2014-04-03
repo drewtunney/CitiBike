@@ -1,0 +1,4 @@
+class DirectionsController <ApplicationController
+
+
+end

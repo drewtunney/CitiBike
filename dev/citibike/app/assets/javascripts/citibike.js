@@ -58,8 +58,9 @@ $(function(){
 
 
 
-function latLongOfAddress() {
+App.latLongOfAddress = function() {
   var geocoder = new google.maps.Geocoder();
+  // hard coded. take input //
   var address = "Yankee Stadium";
   geocoder.geocode( { 'address': address}, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {

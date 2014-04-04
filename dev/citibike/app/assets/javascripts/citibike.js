@@ -1,59 +1,31 @@
-// add event listener to form submission
-$(document).ready(function(){
-  $('#get-directions-form').on('submit', function(e){
-    $('.adp').remove();
-    e.preventDefault();
-    getDirections();
+App.directionsService = new google.maps.DirectionsService();
+App.directionsDisplay = new google.maps.DirectionsRenderer();
+
+App.getDirections = function(){
+  var start  = $('#start').val();
+  var end    = $('#end').val();
+  var waypts = [];
+  var request;
+
+  waypts.push({
+        location:"Central Park",
+        stopover:true
   });
-});
-
-
-function getDirections(){
-  $(document).ready(function() {
-
-  var directionsService = new google.maps.DirectionsService();
-
-  // initialize map
-  function initialize() {
-    directionsDisplay = new google.maps.DirectionsRenderer();
-    var new_york = new google.maps.LatLng(40.7284186, -73.98713956);
-    var mapOptions = {
-      zoom: 14,
-      center: new_york
+  request = {
+    origin:start,
+    destination:end,
+    waypoints: waypts,
+    optimizeWaypoints: true,
+    travelMode: google.maps.TravelMode.BICYCLING
+  };
+  App.directionsService.route(request, function(result, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+      App.directionsDisplay.setDirections(result);
     }
-    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-    directionsDisplay.setMap(map);
-    directionsDisplay.setPanel(document.getElementById("directionsPanel"));
-  }
-
-  // calculate route
-  function calcRoute() {
-    var start = $('#start').val();
-    var end = $('#end').val();
-    var waypts = []
-    waypts.push({
-          location:"Central Park",
-          stopover:true
-      });
-    var request = {
-      origin:start,
-      destination:end,
-      waypoints: waypts,
-      optimizeWaypoints: true,
-      travelMode: google.maps.TravelMode.BICYCLING
-    };
-    directionsService.route(request, function(result, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-        directionsDisplay.setDirections(result);
-      }
-    });
-  } 
-  initialize();
-  calcRoute();
   });
 }
 
-function getCurrentLocation(){
+App.getCurrentLocation = function(){
   if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -64,3 +36,22 @@ function getCurrentLocation(){
     handleNoGeolocation(false);
   }
 }
+
+$(function(){
+  // initialize map
+  var new_york = new google.maps.LatLng(40.7284186, -73.98713956);
+  var mapOptions = {
+    zoom: 14,
+    center: new_york
+  }
+  map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  App.directionsDisplay.setMap(map);
+  App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+
+  // add event listener to form submission
+  $('#get-directions-form').on('submit', function(e){
+    $('.adp').remove();
+    e.preventDefault();
+    App.getDirections();
+  });
+});

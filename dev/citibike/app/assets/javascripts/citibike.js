@@ -55,3 +55,19 @@ $(function(){
     App.getDirections();
   });
 });
+
+
+
+function latLongOfAddress() {
+  var geocoder = new google.maps.Geocoder();
+  var address = "Yankee Stadium";
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      console.log(results[0].geometry.location.lat());
+      console.log(results[0].geometry.location.lng());
+      console.log(results);
+    } else {
+      alert("Geocode was not successful for the following reason: " + status);
+    }
+  });
+}

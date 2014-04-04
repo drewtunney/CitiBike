@@ -27,9 +27,16 @@ function getDirections(){
   function calcRoute() {
     var start = $('#start').val();
     var end = $('#end').val();
+    var waypts = []
+    waypts.push({
+          location:"Central Park",
+          stopover:true
+      });
     var request = {
       origin:start,
       destination:end,
+      waypoints: waypts,
+      optimizeWaypoints: true,
       travelMode: google.maps.TravelMode.BICYCLING
     };
     directionsService.route(request, function(result, status) {

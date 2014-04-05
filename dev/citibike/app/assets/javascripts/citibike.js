@@ -1,22 +1,63 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
 
-getStations = function(){
+
+App.getStations = function(){
   $.getJSON('/stations', function(data){ 
-    stations = data; console.log(stations)
+    stations = data; 
+    console.log(stations)
   });
 }
 
+
+function latLong(location, callback) {
+    var geocoder = new google.maps.Geocoder();
+    var address = location;
+    var longitude;
+    var latitude;
+    geocoder.geocode({
+        'address': address
+    }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            latitude = results[0].geometry.location.lat();
+            longitude = results[0].geometry.location.lng();
+            callback(latitude, longitude);
+        } else {
+            alert("Geocode was not successful for the following reason: " + status);
+        }
+    });
+}
+
 App.getDirections = function(){
-  var start  = $('#start').val();
-  var end    = $('#end').val();
-  var waypts = [];
+  var start         = $('#start').val();
+  var end           = $('#end').val();
+  var waypts        = [];
   var request;
+  var startLat;
+  var startLon;
+  var endLat;
+  var endLon;
+  var startStation;
+  var endStation;
+
+  latLong(start, function(lat, lon) {
+    startLat = lat;
+    startLon = lon;
+  });
+
+  latLong(end, function(lat, lon) {
+    endLat = lat;
+    endLon = lon;
+  });
+
+  startStation = findNearestStation(startLat, startLon);
+  console.log(startStation)
 
   waypts.push({
-        location:"Mott and Prince, New York, NY",
+        location: "Central Park, NYC",
         stopover:true
   });
+
   request = {
     origin:start,
     destination:end,
@@ -38,7 +79,6 @@ App.getCurrentLocation = function(){
       console.log(pos)
     });
   } else {
-    // Browser doesn't support Geolocation
     handleNoGeolocation(false);
   }
 }
@@ -47,12 +87,14 @@ $(function(){
   // initialize map
   var new_york = new google.maps.LatLng(40.7284186, -73.98713956);
   var mapOptions = {
-    zoom: 14,
+    zoom: 12,
     center: new_york
   }
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay.setMap(map);
   App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+  // load Stations
+  App.getStations();
 
   // add event listener to form submission
   $('#get-directions-form').on('submit', function(e){
@@ -61,20 +103,3 @@ $(function(){
     App.getDirections();
   });
 });
-
-
-
-App.latLongOfAddress = function() {
-  var geocoder = new google.maps.Geocoder();
-  // hard coded. take input //
-  var address = "Yankee Stadium";
-  geocoder.geocode( { 'address': address}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-      console.log(results[0].geometry.location.lat());
-      console.log(results[0].geometry.location.lng());
-      console.log(results);
-    } else {
-      alert("Geocode was not successful for the following reason: " + status);
-    }
-  });
-}

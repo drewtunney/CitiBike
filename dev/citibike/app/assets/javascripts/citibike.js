@@ -1,6 +1,12 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
 
+getStations = function(){
+  $.getJSON('/stations', function(data){ 
+    stations = data; console.log(stations)
+  });
+}
+
 App.getDirections = function(){
   var start  = $('#start').val();
   var end    = $('#end').val();
@@ -8,7 +14,7 @@ App.getDirections = function(){
   var request;
 
   waypts.push({
-        location:"Central Park",
+        location:"Mott and Prince, New York, NY",
         stopover:true
   });
   request = {

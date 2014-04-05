@@ -2,13 +2,13 @@ App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
 
 
+
 App.getStations = function(){
   $.getJSON('/stations', function(data){ 
     stations = data; 
     console.log(stations)
   });
 }
-
 
 function latLong(location, callback) {
     var geocoder = new google.maps.Geocoder();
@@ -28,41 +28,26 @@ function latLong(location, callback) {
     });
 }
 
-App.getDirections = function(){
-  var start         = $('#start').val();
-  var end           = $('#end').val();
-  var waypts        = [];
-  var request;
-  var startLat;
-  var startLon;
-  var endLat;
-  var endLon;
-  var startStation;
-  var endStation;
+setStation = function() {
+  var start = $('#start').val();
+  var startStationLat;
+  var startStationLon;
+  var startStation;           
 
   latLong(start, function(lat, lon) {
-    startLat = lat;
-    startLon = lon;
+    station = findNearestStation(lat, lon);
+    startStationLat = station['latitude']
+    startStationLon = station['longitude']
   });
+}
 
-  latLong(end, function(lat, lon) {
-    endLat = lat;
-    endLon = lon;
-  });
-
-  startStation = findNearestStation(startLat, startLon);
-  console.log(startStation)
-
-  waypts.push({
-        location: "Central Park, NYC",
-        stopover:true
-  });
+App.getDirections = function(start, startStationLat, startStationLon){
+  var start = start;
+  var startStation = new google.maps.LatLng(startStationLat, startStationLon);
 
   request = {
     origin:start,
-    destination:end,
-    waypoints: waypts,
-    optimizeWaypoints: true,
+    destination:startStation,
     travelMode: google.maps.TravelMode.BICYCLING
   };
   App.directionsService.route(request, function(result, status) {

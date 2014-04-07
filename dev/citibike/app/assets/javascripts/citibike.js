@@ -1,5 +1,5 @@
 App.directionsService = new google.maps.DirectionsService();
-App.directionsDisplay = new google.maps.DirectionsRenderer();
+App.directionsDisplay1 = new google.maps.DirectionsRenderer();
 App.directionsDisplay2 = new google.maps.DirectionsRenderer();
 App.directionsDisplay3 = new google.maps.DirectionsRenderer();
 
@@ -69,22 +69,23 @@ App.buildDirections = function(){
     
     App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
-        App.directionsDisplay.setDirections(result);
-        console.log(result);
+        $('#directions-info1').text("Walk From " + App.startPoint + " to the CitiBike Station at " + App.startStation.stationName);
+        App.directionsDisplay1.setDirections(result);
+        console.log(App.startStation);
       }
     });
 
     App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
+        $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
         App.directionsDisplay2.setDirections(result);
-        console.log(result);
       }
     });
 
     App.directionsService.route(endLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
+        $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
         App.directionsDisplay3.setDirections(result);
-        console.log(result);
       }
     });
   }
@@ -125,8 +126,8 @@ $(function(){
   };
 
   var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-  App.directionsDisplay.setMap(map);
-  App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+  App.directionsDisplay1.setMap(map);
+  App.directionsDisplay1.setPanel(document.getElementById("directionsPanel1"));
   App.directionsDisplay2.setPanel(document.getElementById("directionsPanel2"));
   App.directionsDisplay3.setPanel(document.getElementById("directionsPanel3"));
   

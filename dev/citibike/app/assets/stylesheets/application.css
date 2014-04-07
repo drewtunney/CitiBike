@@ -33,14 +33,12 @@ body {
 
  }
 
-#directionsPanel {
-  float: right;
-  width: 30%;
-  height: 50%;
-  display: inline-block;
-}
+ #directions-container {
+  width: 100%;
+ }
 
-#directionsPanel2 {
+.directions {
+  vertical-align: text-top;
   width: 30%;
   height: 50%;
   display: inline-block;

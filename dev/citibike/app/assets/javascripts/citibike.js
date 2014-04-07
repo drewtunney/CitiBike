@@ -1,60 +1,93 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
 
-
-
-App.getStations = function(){
+App.updateStationsInfo = function(){
   $.getJSON('/stations', function(data){ 
-    stations = data; 
-    console.log(stations)
+    App.stations = data; 
+    console.log(App.stations);
   });
 }
 
-function latLong(location, callback) {
-    var geocoder = new google.maps.Geocoder();
-    var address = location;
-    var longitude;
-    var latitude;
-    geocoder.geocode({
-        'address': address
-    }, function (results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            latitude = results[0].geometry.location.lat();
-            longitude = results[0].geometry.location.lng();
-            callback(latitude, longitude);
-        } else {
-            alert("Geocode was not successful for the following reason: " + status);
-        }
+App.getStation = function(address, waypoint) {
+  var geocoder = new google.maps.Geocoder();
+
+  geocoder.geocode({
+      'address': address
+  }, function (results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        var latitude  = results[0].geometry.location.lat();
+        var longitude = results[0].geometry.location.lng();
+        
+        var station = findNearestStation(latitude, longitude);
+
+        App.setStation(station, waypoint);
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+  });
+}
+
+App.setStation = function(station, waypoint) {
+  App[waypoint + "Station"] = station;
+  App.buildDirections();
+}
+
+App.buildDirections = function(){
+  if (App.startStation && App.endStation) {
+    console.log("Got stations, ready to build...");
+
+    var startStatLatLng = new google.maps.LatLng(App.startStation.latitude, App.startStation.longitude);
+    var endStatLatLng   = new google.maps.LatLng(App.endStation.latitude,   App.endStation.longitude);
+
+    var startLeg = {
+      origin: App.startPoint,
+      destination: startStatLatLng,
+      travelMode: google.maps.TravelMode.WALKING
+    };
+    var middleLeg = {
+      origin: startStatLatLng,
+      destination: endStatLatLng,
+      travelMode: google.maps.TravelMode.BICYCLING
+    };
+    var endLeg = {
+      origin: endStatLatLng,
+      destination: App.endPoint,
+      travelMode: google.maps.TravelMode.WALKING
+    };
+    
+    App.directionsService.route(startLeg, function(result, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        App.directionsDisplay.setDirections(result);
+      }
     });
+    // debugger;
+    // App.directionsService.route(middleLeg, function(result, status) {
+    //   if (status == google.maps.DirectionsStatus.OK) {
+    //     App.directionsDisplay.setDirections(result);
+    //   }
+    // });
+    // debugger;
+    // App.directionsService.route(endLeg, function(result, status) {
+    //   if (status == google.maps.DirectionsStatus.OK) {
+    //     App.directionsDisplay.setDirections(result);
+    //   }
+    // });
+  }
+  // } else {
+  //   console.log("Some stations set, but not all...");
+  // }
 }
 
-setStation = function() {
-  var start = $('#start').val();
-  var startStationLat;
-  var startStationLon;
-  var startStation;           
+App.getDirections = function(){
+  // get start and end                  ... defaults -- should remove after testing!
+  App.startPoint = $('#start').val() || "10 E 21st St, New York, NY";
+  App.endPoint   = $('#end').val()   || "Central Park W and 79th St, New York, NY";
 
-  latLong(start, function(lat, lon) {
-    station = findNearestStation(lat, lon);
-    startStationLat = station['latitude']
-    startStationLon = station['longitude']
-  });
-}
+  // begin the process of choosing a startStation
+  App.getStation(App.startPoint, "start");
 
-App.getDirections = function(start, startStationLat, startStationLon){
-  var start = start;
-  var startStation = new google.maps.LatLng(startStationLat, startStationLon);
-
-  request = {
-    origin:start,
-    destination:startStation,
-    travelMode: google.maps.TravelMode.BICYCLING
-  };
-  App.directionsService.route(request, function(result, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
-      App.directionsDisplay.setDirections(result);
-    }
-  });
+  // begin the process of choosing an endStation
+  App.getStation(App.endPoint, "end");
 }
 
 App.getCurrentLocation = function(){
@@ -74,12 +107,14 @@ $(function(){
   var mapOptions = {
     zoom: 12,
     center: new_york
-  }
-  map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  };
+
+  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay.setMap(map);
   App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+  
   // load Stations
-  App.getStations();
+  App.updateStationsInfo();
 
   // add event listener to form submission
   $('#get-directions-form').on('submit', function(e){

@@ -1,12 +1,14 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
 
+// load stations object into window
 App.updateStationsInfo = function(){
   $.getJSON('/stations', function(data){ 
     App.stations = data; 
     console.log(App.stations);
   });
 }
+
 
 App.getStation = function(address, waypoint) {
   var geocoder = new google.maps.Geocoder();
@@ -18,9 +20,17 @@ App.getStation = function(address, waypoint) {
         var latitude  = results[0].geometry.location.lat();
         var longitude = results[0].geometry.location.lng();
         
-        var station = findNearestStation(latitude, longitude);
-
-        App.setStation(station, waypoint);
+        if (waypoint === "start") {
+          var station = findPickUpStation(latitude, longitude);
+          App.setStation(station, waypoint);
+          console.log("in start")
+        }
+        else {
+          // change this
+          var station = findDropOffStation(latitude, longitude);
+          App.setStation(station, waypoint);
+          console.log("in end")
+        }
       } else {
         alert("Geocode was not successful for the following reason: " + status);
       }
@@ -55,12 +65,12 @@ App.buildDirections = function(){
       travelMode: google.maps.TravelMode.WALKING
     };
     
-    App.directionsService.route(startLeg, function(result, status) {
+    App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         App.directionsDisplay.setDirections(result);
       }
     });
-    // debugger;
+
     // App.directionsService.route(middleLeg, function(result, status) {
     //   if (status == google.maps.DirectionsStatus.OK) {
     //     App.directionsDisplay.setDirections(result);

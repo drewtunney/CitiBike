@@ -67,15 +67,15 @@ App.buildDirections = function(){
       travelMode: google.maps.TravelMode.WALKING
     };
     
-    App.directionsService.route(middleLeg, function(result, status) {
+    App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info1').text("Walk From " + App.startPoint + " to the CitiBike Station at " + App.startStation.stationName);
+        $('#station-status1').text("There are " + App.startStation.availableBikes + " bikes available");
         App.directionsDisplay1.setDirections(result);
-        console.log(App.startStation);
       }
     });
 
-    App.directionsService.route(startLeg, function(result, status) {
+    App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
         App.directionsDisplay2.setDirections(result);
@@ -85,13 +85,11 @@ App.buildDirections = function(){
     App.directionsService.route(endLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
+        $('#station-status3').text("There are " + App.endStation.availableDocks + " docks available");
         App.directionsDisplay3.setDirections(result);
       }
     });
   }
-  // } else {
-  //   console.log("Some stations set, but not all...");
-  // }
 }
 
 App.getDirections = function(){
@@ -108,6 +106,7 @@ App.getDirections = function(){
 
 App.getCurrentLocation = function(){
   if(navigator.geolocation) {
+    var pos;
     navigator.geolocation.getCurrentPosition(function(position) {
       var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       console.log(pos)

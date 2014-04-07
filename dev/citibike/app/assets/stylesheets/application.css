@@ -27,7 +27,7 @@ body {
 
 #map-canvas { 
   border: 1px solid black;
-  height: 50%; 
+  height: 70%; 
   width: 50%;
   display: inline-block;
 

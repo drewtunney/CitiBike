@@ -1,6 +1,7 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
-App.directionsDisplay1 = new google.maps.DirectionsRenderer();
+App.directionsDisplay2 = new google.maps.DirectionsRenderer();
+App.directionsDisplay3 = new google.maps.DirectionsRenderer();
 
 // load stations object into window
 App.updateStationsInfo = function(){
@@ -75,16 +76,17 @@ App.buildDirections = function(){
 
     App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
-        App.directionsDisplay1.setDirections(result);
+        App.directionsDisplay2.setDirections(result);
         console.log(result);
       }
     });
-    // debugger;
-    // App.directionsService.route(endLeg, function(result, status) {
-    //   if (status == google.maps.DirectionsStatus.OK) {
-    //     App.directionsDisplay.setDirections(result);
-    //   }
-    // });
+
+    App.directionsService.route(endLeg, function(result, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        App.directionsDisplay3.setDirections(result);
+        console.log(result);
+      }
+    });
   }
   // } else {
   //   console.log("Some stations set, but not all...");
@@ -125,7 +127,8 @@ $(function(){
   var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay.setMap(map);
   App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
-  App.directionsDisplay1.setPanel(document.getElementById("directionsPanel2"));
+  App.directionsDisplay2.setPanel(document.getElementById("directionsPanel2"));
+  App.directionsDisplay3.setPanel(document.getElementById("directionsPanel3"));
   
   // load Stations
   App.updateStationsInfo();

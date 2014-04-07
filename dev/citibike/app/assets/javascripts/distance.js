@@ -9,7 +9,6 @@ function findPickUpStation(lat,lng) {
   var closest_station_id;
   $.each(App.stations.stationBeanList, function(i, station) {
     var distance = getDistance(lat,lng, station.latitude, station.longitude);
-
     // set bike count to be greater than 0, should probably set to 1 or 2
     // or have an alert that there is only one bike, and you may want to consider 
     // another station

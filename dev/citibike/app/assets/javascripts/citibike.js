@@ -1,5 +1,6 @@
 App.directionsService = new google.maps.DirectionsService();
 App.directionsDisplay = new google.maps.DirectionsRenderer();
+App.directionsDisplay1 = new google.maps.DirectionsRenderer();
 
 // load stations object into window
 App.updateStationsInfo = function(){
@@ -68,14 +69,16 @@ App.buildDirections = function(){
     App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         App.directionsDisplay.setDirections(result);
+        console.log(result);
       }
     });
 
-    // App.directionsService.route(middleLeg, function(result, status) {
-    //   if (status == google.maps.DirectionsStatus.OK) {
-    //     App.directionsDisplay.setDirections(result);
-    //   }
-    // });
+    App.directionsService.route(startLeg, function(result, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        App.directionsDisplay1.setDirections(result);
+        console.log(result);
+      }
+    });
     // debugger;
     // App.directionsService.route(endLeg, function(result, status) {
     //   if (status == google.maps.DirectionsStatus.OK) {
@@ -122,6 +125,7 @@ $(function(){
   var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay.setMap(map);
   App.directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+  App.directionsDisplay1.setPanel(document.getElementById("directionsPanel2"));
   
   // load Stations
   App.updateStationsInfo();

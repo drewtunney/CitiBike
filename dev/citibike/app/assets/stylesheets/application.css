@@ -25,6 +25,10 @@ body {
   height: 100%; margin: 0; padding: 0
  }
 
+/*.adp-marker {
+  display: none;
+ }*/
+
 #map-canvas { 
   border: 1px solid black;
   height: 90%; 

@@ -1,5 +1,13 @@
 var currentLocation;
 
+// var autocomplete_options = {
+//       componentRestrictions: {country: 'us'}
+//     };
+
+// var autocomplete_start = new google.maps.places.Autocomplete($("#start"), autocomplete_options);
+
+// var autocomplete_end = new google.maps.places.Autocomplete($("#end"), autocomplete_options);
+
 App.directionsService  = new google.maps.DirectionsService();
 App.bounds = new google.maps.LatLngBounds();
 
@@ -13,14 +21,14 @@ App.directionsDisplay1 = new google.maps.DirectionsRenderer({
 
 App.directionsDisplay2 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
-  suppressMarkers : false,
-  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 0.5},
+  suppressMarkers : true,
+  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 1},
 });
 
 App.directionsDisplay3 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
-  suppressMarkers : false,
-  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 0.5},
+  suppressMarkers : true,
+  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 1},
 });
 
 

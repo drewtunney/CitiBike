@@ -1,21 +1,26 @@
+var currentLocation;
 
 App.directionsService  = new google.maps.DirectionsService();
+App.bounds = new google.maps.LatLngBounds();
+
+
 App.directionsDisplay1 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
+  suppressBicyclingLayer: true,
   suppressMarkers : true,
-  polylineOptions : {strokeColor:'blue'},
+  polylineOptions : {strokeColor:'blue', strokeWeight: 5, strokeOpacity: 0.5},
 });
 
 App.directionsDisplay2 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
-  suppressMarkers : true,
-  polylineOptions : {strokeColor:'red'},
+  suppressMarkers : false,
+  polylineOptions : {strokeColor:'yellow'},
 });
 
 App.directionsDisplay3 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
-  suppressMarkers : true,
-  polylineOptions : {strokeColor:'green'},
+  suppressMarkers : false,
+  polylineOptions : {strokeColor:'yellow'},
 });
 
 
@@ -25,34 +30,55 @@ App.updateStationsInfo = function(){
     App.stations = data; 
     console.log(App.stations);
   });
-}
+};
 
+App.getCurrentLocation = function(){
+  if(navigator.geolocation) {
+    var pos;
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      currentLocation = pos;
+      console.log(currentLocation);
+      // passing pick up station, current location || not sure where to go from here //
+      var station = findPickUpStation(currentLocation["k"], currentLocation["A"]);
+      console.log("station --> " + console.log(station))
+      App.setStation(station, "start")
+    });
+  } else {
+    handleNoGeolocation(false);
+  }
+};
 
 App.getStation = function(address, waypoint) {
   var geocoder = new google.maps.Geocoder();
 
-  geocoder.geocode({
-      'address': address
-  }, function (results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        var latitude  = results[0].geometry.location.lat();
-        var longitude = results[0].geometry.location.lng();
-        
-        if (waypoint === "start") {
-          var station = findPickUpStation(latitude, longitude);
-          App.setStation(station, waypoint);
-          console.log("in start")
-        }
-        else {
-          var station = findDropOffStation(latitude, longitude);
-          App.setStation(station, waypoint);
+  if (address === "Current Location"){
+    App.getCurrentLocation();
 
-          console.log("in end")
+  } else {
+    geocoder.geocode({
+        'address': address
+    }, function (results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          var latitude  = results[0].geometry.location.lat();
+          var longitude = results[0].geometry.location.lng();
+          
+          if (waypoint === "start") {
+            var station = findPickUpStation(latitude, longitude);
+            App.setStation(station, waypoint);
+            console.log("in start")
+          }
+          else {
+            var station = findDropOffStation(latitude, longitude);
+            App.setStation(station, waypoint);
+
+            console.log("in end")
+          }
+        } else {
+          alert("Geocode was not successful for the following reason: " + status);
         }
-      } else {
-        alert("Geocode was not successful for the following reason: " + status);
-      }
-  });
+    });
+  } 
 }
 
 App.setStation = function(station, waypoint) {
@@ -62,12 +88,16 @@ App.setStation = function(station, waypoint) {
 
 }
 
+
 App.buildDirections = function(){
   if (App.startStation && App.endStation) {
     console.log("Got stations, ready to build...");
 
     var startStatLatLng = new google.maps.LatLng(App.startStation.latitude, App.startStation.longitude);
     var endStatLatLng   = new google.maps.LatLng(App.endStation.latitude,   App.endStation.longitude);
+
+    App.bounds.extend(startStatLatLng);
+    App.bounds.extend(endStatLatLng);
 
     var startLeg = {
       origin: App.startPoint,
@@ -87,6 +117,8 @@ App.buildDirections = function(){
     
     App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
+        // Middle Leg of Current Location not working 
+        // console.log("directionsService result --> " + console.log(result);
         $('#directions-info1').text("Walk From " + App.startPoint + " to the CitiBike Station at " + App.startStation.stationName);
         $('#station-status1').text("There are " + App.startStation.availableBikes + " bikes available");
         App.directionsDisplay1.setDirections(result);
@@ -96,8 +128,6 @@ App.buildDirections = function(){
     App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
-        // var trip_legs = result.routes[0].overview_path;
-        // App.drawPolylines(trip_legs);
         App.directionsDisplay2.setDirections(result);
       }
     });
@@ -106,9 +136,9 @@ App.buildDirections = function(){
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
         $('#station-status3').text("There are " + App.endStation.availableDocks + " docks available");
-        // var trip_legs = result.routes[0].overview_path;
-        // App.drawPolylines(trip_legs);
         App.directionsDisplay3.setDirections(result);
+        console.log("result bounds -->" + result.routes[0].bounds);
+        // console.log("App.bounds" + App.bounds)
       }
     });
   }
@@ -116,8 +146,8 @@ App.buildDirections = function(){
 
 App.getDirections = function(){
   // get start and end                  ... defaults -- should remove after testing!
-  App.startPoint = $('#start').val() || "10 E 21st St, New York, NY";
-  App.endPoint   = $('#end').val()   || "Central Park W and 79th St, New York, NY";
+  App.startPoint = $('#start').val() || "260 Elizabeth St, NYC";
+  App.endPoint   = $('#end').val()   || "The Morgan Library, NYC";
 
   // begin the process of choosing a startStation
   App.getStation(App.startPoint, "start");
@@ -126,25 +156,15 @@ App.getDirections = function(){
   App.getStation(App.endPoint, "end");
 }
 
-App.getCurrentLocation = function(){
-  if(navigator.geolocation) {
-    var pos;
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      console.log(pos)
-    });
-  } else {
-    handleNoGeolocation(false);
-  }
-}
-
-
 $(function(){
   // initialize map
+
   var new_york = new google.maps.LatLng(40.7284186, -73.98713956);
+  var styles = [{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"water","elementType":"geometry","stylers":[{"visibility":"on"},{"color":"#C6E2FF"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#C5E3BF"}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#D1D1B8"}]}];
   var mapOptions = {
     zoom: 12,
-    center: new_york
+    center: new_york,
+    styles: styles
   };
 
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
@@ -160,10 +180,27 @@ $(function(){
   window.setInterval(App.updateStationsInfo, 60000);
   // setStationInterval();
 
+  // $('#get-current-location').on('click', App.getCurrentLocation());
   // add event listener to form submission
   $('#get-directions-form').on('submit', function(e){
     $('.adp').remove();
     e.preventDefault();
     App.getDirections();
   });
+
+});
+
+// set bounds on new directions
+
+google.maps.event.addListener(App.directionsDisplay1, 'directions_changed', function() {
+  map.setCenter(App.bounds.getCenter(), map.fitBounds(App.bounds));
+});
+google.maps.event.addListener(App.directionsDisplay2, 'directions_changed', function() {
+  map.setCenter(App.bounds.getCenter(), map.fitBounds(App.bounds));
+  console.log("second event listener")
+});
+
+google.maps.event.addListener(App.directionsDisplay3, 'directions_changed', function() {
+  map.setCenter(App.bounds.getCenter(), map.fitBounds(App.bounds));
+  console.log("third event listener")
 });

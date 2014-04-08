@@ -44,3 +44,7 @@ body {
   display: inline-block;
 }
 
+.adp-warnbox{
+  display: none;
+}
+

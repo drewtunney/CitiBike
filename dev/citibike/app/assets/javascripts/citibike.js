@@ -91,6 +91,8 @@ App.buildDirections = function(){
     App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
+        var trip_legs = result.routes[0].overview_path;
+        drawPolylines(trip_legs);
         App.directionsDisplay2.setDirections(result);
       }
     });

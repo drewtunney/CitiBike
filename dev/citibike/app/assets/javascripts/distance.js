@@ -38,3 +38,24 @@ function findDropOffStation(lat,lng) {
 
   return App.stations.stationBeanList[closest_station_id];
 }
+
+function drawPolylines(results){
+  // this object should come in with an array of the LatLong coordinates
+  var trip_legs = results;
+  // trip_coordinates = [];
+
+  var walkingRoute = new google.maps.Polyline({
+    path: trip_legs,
+    geodesic: true,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+
+  walkingRoute.setMap(map);
+
+  // for (var i = 0; i < trip_legs.length; i++){
+  //   trip_coordinates.push(new google.maps.LatLng(trip_legs[i]["k"], trip_legs[i]["A"]))
+  // }
+
+}

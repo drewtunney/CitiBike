@@ -25,25 +25,12 @@ App.getStation = function(address, waypoint) {
         if (waypoint === "start") {
           var station = findPickUpStation(latitude, longitude);
           App.setStation(station, waypoint);
-
-          // drop starting pin
-          var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(latitude, longitude),
-            map: map,
-            title: 'Starting Point'
-          });
           console.log("in start")
         }
         else {
           var station = findDropOffStation(latitude, longitude);
           App.setStation(station, waypoint);
 
-          // drop ending pin
-          var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(latitude, longitude),
-            map: map,
-            title: 'Ending Point'
-          });
           console.log("in end")
         }
       } else {
@@ -92,7 +79,7 @@ App.buildDirections = function(){
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
         var trip_legs = result.routes[0].overview_path;
-        drawPolylines(trip_legs);
+        App.drawPolylines(trip_legs);
         App.directionsDisplay2.setDirections(result);
       }
     });
@@ -101,6 +88,8 @@ App.buildDirections = function(){
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
         $('#station-status3').text("There are " + App.endStation.availableDocks + " docks available");
+        var trip_legs = result.routes[0].overview_path;
+        App.drawPolylines(trip_legs);
         App.directionsDisplay3.setDirections(result);
       }
     });

@@ -1,4 +1,4 @@
-App.directionsService = new google.maps.DirectionsService();
+App.directionsService  = new google.maps.DirectionsService();
 App.directionsDisplay1 = new google.maps.DirectionsRenderer();
 App.directionsDisplay2 = new google.maps.DirectionsRenderer();
 App.directionsDisplay3 = new google.maps.DirectionsRenderer();
@@ -25,12 +25,25 @@ App.getStation = function(address, waypoint) {
         if (waypoint === "start") {
           var station = findPickUpStation(latitude, longitude);
           App.setStation(station, waypoint);
+
+          // drop starting pin
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(latitude, longitude),
+            map: map,
+            title: 'Starting Point'
+          });
           console.log("in start")
         }
         else {
-          // change this
           var station = findDropOffStation(latitude, longitude);
           App.setStation(station, waypoint);
+
+          // drop ending pin
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(latitude, longitude),
+            map: map,
+            title: 'Ending Point'
+          });
           console.log("in end")
         }
       } else {
@@ -67,7 +80,7 @@ App.buildDirections = function(){
       travelMode: google.maps.TravelMode.WALKING
     };
     
-    App.directionsService.route(startLeg, function(result, status) {
+    App.directionsService.route(middleLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info1').text("Walk From " + App.startPoint + " to the CitiBike Station at " + App.startStation.stationName);
         $('#station-status1').text("There are " + App.startStation.availableBikes + " bikes available");
@@ -75,7 +88,7 @@ App.buildDirections = function(){
       }
     });
 
-    App.directionsService.route(middleLeg, function(result, status) {
+    App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
         App.directionsDisplay2.setDirections(result);
@@ -124,7 +137,7 @@ $(function(){
     center: new_york
   };
 
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+  map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay1.setMap(map);
   App.directionsDisplay1.setPanel(document.getElementById("directionsPanel1"));
   App.directionsDisplay2.setPanel(document.getElementById("directionsPanel2"));

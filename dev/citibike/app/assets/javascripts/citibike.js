@@ -1,7 +1,22 @@
+
 App.directionsService  = new google.maps.DirectionsService();
-App.directionsDisplay1 = new google.maps.DirectionsRenderer();
-App.directionsDisplay2 = new google.maps.DirectionsRenderer();
-App.directionsDisplay3 = new google.maps.DirectionsRenderer();
+App.directionsDisplay1 = new google.maps.DirectionsRenderer({
+  preserveViewport: true,
+  suppressMarkers : true,
+  polylineOptions : {strokeColor:'blue'},
+});
+
+App.directionsDisplay2 = new google.maps.DirectionsRenderer({
+  preserveViewport: true,
+  suppressMarkers : true,
+  polylineOptions : {strokeColor:'red'},
+});
+
+App.directionsDisplay3 = new google.maps.DirectionsRenderer({
+  preserveViewport: true,
+  suppressMarkers : true,
+  polylineOptions : {strokeColor:'green'},
+});
 
 
 // load stations object into window
@@ -44,6 +59,7 @@ App.setStation = function(station, waypoint) {
   App[waypoint + "Station"] = station;
   // TODO remove polylines function here? 
   App.buildDirections();
+
 }
 
 App.buildDirections = function(){
@@ -80,8 +96,8 @@ App.buildDirections = function(){
     App.directionsService.route(startLeg, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
-        var trip_legs = result.routes[0].overview_path;
-        App.drawPolylines(trip_legs);
+        // var trip_legs = result.routes[0].overview_path;
+        // App.drawPolylines(trip_legs);
         App.directionsDisplay2.setDirections(result);
       }
     });
@@ -90,8 +106,8 @@ App.buildDirections = function(){
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
         $('#station-status3').text("There are " + App.endStation.availableDocks + " docks available");
-        var trip_legs = result.routes[0].overview_path;
-        App.drawPolylines(trip_legs);
+        // var trip_legs = result.routes[0].overview_path;
+        // App.drawPolylines(trip_legs);
         App.directionsDisplay3.setDirections(result);
       }
     });
@@ -122,6 +138,7 @@ App.getCurrentLocation = function(){
   }
 }
 
+
 $(function(){
   // initialize map
   var new_york = new google.maps.LatLng(40.7284186, -73.98713956);
@@ -132,6 +149,8 @@ $(function(){
 
   map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
   App.directionsDisplay1.setMap(map);
+  App.directionsDisplay2.setMap(map);
+  App.directionsDisplay3.setMap(map);
   App.directionsDisplay1.setPanel(document.getElementById("directionsPanel1"));
   App.directionsDisplay2.setPanel(document.getElementById("directionsPanel2"));
   App.directionsDisplay3.setPanel(document.getElementById("directionsPanel3"));

@@ -39,18 +39,31 @@ function findDropOffStation(lat,lng) {
   return App.stations.stationBeanList[closest_station_id];
 }
 
- App.drawPolylines = function(results){
+var walkingRoute;
+
+App.drawPolylines = function(results){
   // this object should come in with an array of the LatLong coordinates
   var trip_legs = results;
 
-  var walkingRoute = new google.maps.Polyline({
+  walkingRoute = new google.maps.Polyline({
     path: trip_legs,
     geodesic: true,
     strokeColor: '#FF0000',
     strokeOpacity: 1.0,
     strokeWeight: 3
   });
-
-  walkingRoute.setMap(map);
-
+  App.addWalkingRoute();
 }
+
+App.addWalkingRoute = function(){
+  walkingRoute.setMap(map);
+};
+
+App.removeWalkingRoutes = function(){
+  walkingRoute.setMap(null);
+}
+
+
+
+
+

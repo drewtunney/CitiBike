@@ -3,6 +3,7 @@ App.directionsDisplay1 = new google.maps.DirectionsRenderer();
 App.directionsDisplay2 = new google.maps.DirectionsRenderer();
 App.directionsDisplay3 = new google.maps.DirectionsRenderer();
 
+
 // load stations object into window
 App.updateStationsInfo = function(){
   $.getJSON('/stations', function(data){ 
@@ -41,6 +42,7 @@ App.getStation = function(address, waypoint) {
 
 App.setStation = function(station, waypoint) {
   App[waypoint + "Station"] = station;
+  // TODO remove polylines function here? 
   App.buildDirections();
 }
 
@@ -136,6 +138,8 @@ $(function(){
   
   // load Stations
   App.updateStationsInfo();
+  window.setInterval(App.updateStationsInfo, 60000);
+  // setStationInterval();
 
   // add event listener to form submission
   $('#get-directions-form').on('submit', function(e){

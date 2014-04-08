@@ -14,13 +14,13 @@ App.directionsDisplay1 = new google.maps.DirectionsRenderer({
 App.directionsDisplay2 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
   suppressMarkers : false,
-  polylineOptions : {strokeColor:'yellow'},
+  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 0.5},
 });
 
 App.directionsDisplay3 = new google.maps.DirectionsRenderer({
   preserveViewport: true,
   suppressMarkers : false,
-  polylineOptions : {strokeColor:'yellow'},
+  polylineOptions : {strokeColor:'yellow', strokeWeight: 5, strokeOpacity: 0.5},
 });
 
 
@@ -83,7 +83,6 @@ App.getStation = function(address, waypoint) {
 
 App.setStation = function(station, waypoint) {
   App[waypoint + "Station"] = station;
-  // TODO remove polylines function here? 
   App.buildDirections();
 
 }
@@ -98,6 +97,10 @@ App.buildDirections = function(){
 
     App.bounds.extend(startStatLatLng);
     App.bounds.extend(endStatLatLng);
+
+    console.log("start point = " + App.startPoint);
+
+    // TODO: for current location, App.StartPoint needs to be (longitude, lattitude), not "Current Location"
 
     var startLeg = {
       origin: App.startPoint,
@@ -129,6 +132,7 @@ App.buildDirections = function(){
       if (status == google.maps.DirectionsStatus.OK) {
         $('#directions-info2').text("Bike From the " + App.startStation.stationName + " Station to the " + App.endStation.stationName + " Station");
         App.directionsDisplay2.setDirections(result);
+        console.log("result from directionsServce start leg --> " + result);
       }
     });
 
@@ -137,8 +141,6 @@ App.buildDirections = function(){
         $('#directions-info3').text("Walk From " + App.endStation.stationName + " Station to " + App.endPoint);
         $('#station-status3').text("There are " + App.endStation.availableDocks + " docks available");
         App.directionsDisplay3.setDirections(result);
-        console.log("result bounds -->" + result.routes[0].bounds);
-        // console.log("App.bounds" + App.bounds)
       }
     });
   }

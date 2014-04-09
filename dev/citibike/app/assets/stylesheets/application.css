@@ -22,6 +22,7 @@ html {
  }
 
 body { 
+  background-color: 'gray';
   height: 100%; margin: 0; padding: 0
  }
 
@@ -32,13 +33,15 @@ body {
 #map-canvas { 
   border: 1px solid black;
   height: 90%; 
-  width: 90%;
+  width: 80%;
   display: inline-block;
+  margin: 0 auto;
 
  }
 
  #directions-container {
   width: 100%;
+
  }
 
 .directions {
@@ -46,6 +49,7 @@ body {
   width: 30%;
   height: 50%;
   display: inline-block;
+  font-size: 12px;
 }
 
 .adp-warnbox{
